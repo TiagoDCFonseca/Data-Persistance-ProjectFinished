@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
+    public Text bestScoreText;
+    [SerializeField] private Button restartButton;
     
     private bool m_Started = false;
     private int m_Points;
@@ -22,6 +25,8 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        restartButton.gameObject.SetActive(false);
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -55,11 +60,14 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+            restartButton.gameObject.SetActive(true);
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
+        UpdateBestScore();
     }
 
     void AddPoint(int point)
@@ -72,5 +80,23 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+    void UpdateBestScore()
+    {
+        if (PlayerPrefs.GetInt("Best Score") <= 0)
+        {
+            PlayerPrefs.SetInt("Best Score", 0);
+        }
+
+        bestScoreText.text = "Best Score: " + "Tiago " + PlayerPrefs.GetInt("Best Score");
+
+        if(PlayerPrefs.GetInt("Best Score") < m_Points)
+        {
+            PlayerPrefs.SetInt("Best Score", m_Points);
+        }
+    }
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
